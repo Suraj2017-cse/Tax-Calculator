@@ -15,12 +15,12 @@
                 <h5 class="card-title">Tax Calculator</h5>
                 <form id="taxForm">
                     <div class="mb-3">
-                        <label for="grossIncome" class="form-label">Gross Annual Income (Lakhs)</label>
+                        <label for="grossIncome" class="form-label">Gross Annual Income</label>
                         <input type="text" class="form-control" id="grossIncome"
                             placeholder="Enter Gross Annual Income">
                     </div>
                     <div class="mb-3">
-                        <label for="extraIncome" class="form-label">Extra Income (Lakhs)</label>
+                        <label for="extraIncome" class="form-label">Extra Income</label>
                         <input type="text" class="form-control" id="extraIncome" placeholder="Enter Extra Income">
                     </div>
                     <div class="mb-3">
@@ -28,10 +28,9 @@
                         <input type="text" class="form-control" id="age" placeholder="Enter Age">
                     </div>
                     <div class="mb-3">
-                        <label for="deductions" class="form-label">Deductions (Lakhs)</label>
+                        <label for="deductions" class="form-label">Deductions</label>
                         <input type="text" class="form-control" id="deductions" placeholder="Enter Deductions">
                     </div>
-
                     <button type="submit" class="btn btn-primary">Calculate Tax</button>
                 </form>
             </div>
@@ -56,6 +55,8 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    </script>
     <script>
         document.getElementById('taxForm').addEventListener('submit', function (event) {
             event.preventDefault();
@@ -65,35 +66,38 @@
 
             ['grossIncome', 'extraIncome', 'deductions', 'age'].forEach(function (inputId) {
                 let input = document.getElementById(inputId);
-                if (!input.value.trim() || isNaN(input.value)) {
+                if (!input.value.trim() || isNaN(parseFloat(input.value))) {
                     input.classList.add('is-invalid');
                     valid = false;
                 } else {
                     input.classList.remove('is-invalid');
-                    values[inputId] = parseFloat(input.value);
+                    values[inputId] = parseFloat(input.value)
                 }
             });
 
             if (valid) {
                 let netIncome = values.grossIncome + values.extraIncome - values.deductions;
                 let taxDueText;
-                if (netIncome <= 8) {
+                if (netIncome <= 800000) {
                     taxDueText = 'No tax due (Income ≤ 8 Lakhs)';
                 } else {
-                    let taxRate = (values.age < 40) ? 0.30 : (values.age < 60) ? 0.40 : 0.10;
-                    let taxDue = taxRate * (netIncome - 8);
-                    taxDueText = taxDue.toFixed(2) + ' after tax deductions';
+                    let taxRate;
+                    if (values.age < 40) {
+                        taxRate = 0.30;
+                    } else if (values.age >= 40 && values.age < 60) {
+                        taxRate = 0.40;
+                    } else {
+                        taxRate = 0.10;
+                    }
+                    let taxDue = taxRate * (netIncome - 800000);
+                    taxDueText = `${taxDue.toFixed(2).toLocaleString()} after tax deductions`;
                 }
                 taxDueElement.textContent = taxDueText;
                 new bootstrap.Modal(document.getElementById('resultModal')).show();
             } else {
                 taxDueElement.textContent = 'Please correct the input errors.';
-                // new bootstrap.Modal(document.getElementById('resultModal')).show();
             }
         });
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
     </script>
 </body>
 
