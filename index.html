@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+        <div class="card" style="width: 100%; max-width: 600px;">
+            <div class="card-body">
+                <h5 class="card-title">Tax Calculator</h5>
+                <form id="taxForm">
+                    <div class="mb-3">
+                        <label for="grossIncome" class="form-label">Gross Annual Income (Lakhs)</label>
+                        <input type="text" class="form-control" id="grossIncome"
+                            placeholder="Enter Gross Annual Income">
+                    </div>
+                    <div class="mb-3">
+                        <label for="extraIncome" class="form-label">Extra Income (Lakhs)</label>
+                        <input type="text" class="form-control" id="extraIncome" placeholder="Enter Extra Income">
+                    </div>
+                    <div class="mb-3">
+                        <label for="age" class="form-label">Age</label>
+                        <input type="text" class="form-control" id="age" placeholder="Enter Age">
+                    </div>
+                    <div class="mb-3">
+                        <label for="deductions" class="form-label">Deductions (Lakhs)</label>
+                        <input type="text" class="form-control" id="deductions" placeholder="Enter Deductions">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Calculate Tax</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Your overall income will be</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="taxDue">Calculating...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('taxForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let valid = true;
+            let taxDueElement = document.getElementById('taxDue');
+            let values = {};
+
+            ['grossIncome', 'extraIncome', 'deductions', 'age'].forEach(function (inputId) {
+                let input = document.getElementById(inputId);
+                if (!input.value.trim() || isNaN(input.value)) {
+                    input.classList.add('is-invalid');
+                    valid = false;
+                } else {
+                    input.classList.remove('is-invalid');
+                    values[inputId] = parseFloat(input.value);
+                }
+            });
+
+            if (valid) {
+                let netIncome = values.grossIncome + values.extraIncome - values.deductions;
+                let taxDueText;
+                if (netIncome <= 8) {
+                    taxDueText = 'No tax due (Income ≤ 8 Lakhs)';
+                } else {
+                    let taxRate = (values.age < 40) ? 0.30 : (values.age < 60) ? 0.40 : 0.10;
+                    let taxDue = taxRate * (netIncome - 8);
+                    taxDueText = taxDue.toFixed(2) + ' after tax deductions';
+                }
+                taxDueElement.textContent = taxDueText;
+                new bootstrap.Modal(document.getElementById('resultModal')).show();
+            } else {
+                taxDueElement.textContent = 'Please correct the input errors.';
+                // new bootstrap.Modal(document.getElementById('resultModal')).show();
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    </script>
+</body>
+
+</html>
